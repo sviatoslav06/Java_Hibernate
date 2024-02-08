@@ -13,9 +13,7 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        //menu();
-        //AddProduct();
-        ShowProducts();
+        menu();
     }
 
     private static void menu() {
@@ -23,10 +21,14 @@ public class Main {
         Scanner in = new Scanner(System.in);
         do {
             System.out.println("0 - Вихід");
-            System.out.println("1 - Додати");
-            System.out.println("2 - Показати всі");
-            System.out.println("3 - Редагувати");
-            System.out.println("4 - Видалити");
+            System.out.println("1 - Додати категорію");
+            System.out.println("2 - Показати всі категорії");
+            System.out.println("3 - Редагувати категорію");
+            System.out.println("4 - Видалити категорію");
+            System.out.println("5 - Додати продукт");
+            System.out.println("6 - Показати всі продукти");
+            System.out.println("7 - Редагувати продукт");
+            System.out.println("8 - Видалити продукт");
             System.out.println("->_");
             action = in.nextInt();
             switch (action) {
@@ -41,6 +43,18 @@ public class Main {
                     break;
                 case 4:
                     DeleteCategory();
+                    break;
+                case 5:
+                    AddProduct();
+                    break;
+                case 6:
+                    ShowProducts();
+                    break;
+                case 7:
+                    EditProduct();
+                    break;
+                case 8:
+                    DeleteProduct();
                     break;
                 case 0:
                     System.out.println("До зустрічі!!!");
@@ -165,6 +179,59 @@ public class Main {
             for (Product product : list) {
                 System.out.println("Product: " + product);
             }
+            context.getTransaction().commit();
+        }
+    }
+
+    private static void EditProduct() {
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        Scanner in = new Scanner(System.in);
+        System.out.println("Введіть номер продукту яку хочете відредагувати: ");
+        int q = in.nextInt();
+        in.nextLine();
+
+        try (Session context = sf.openSession()) {
+            context.beginTransaction();
+
+            Product product = context.get(Product.class, q);
+
+            System.out.println("Вкажіть нову назву: ");
+            String text = in.nextLine();
+            product.setName(text);
+            System.out.println("Вкажіть новий опис: ");
+            String desc = in.nextLine();
+            product.setDescription(desc);
+            System.out.println("Вкажіть нову ціну: ");
+            int price = in.nextInt();
+            in.nextLine();
+            product.setPrice(price);
+            System.out.println("Вкажіть нову категорію: ");
+            int id = in.nextInt();
+            in.nextLine();
+            Category category = new Category();
+            category.setId(id);
+            product.setCategory(category);
+
+            context.update(product);
+            context.getTransaction().commit();
+        }
+    }
+
+    private static void DeleteProduct() {
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+
+        Scanner in = new Scanner(System.in);
+        System.out.println("Введіть номер продукту яку хочете видалити: ");
+        int q = in.nextInt();
+        in.nextLine();
+
+        try (Session context = sf.openSession()) {
+            context.beginTransaction();
+
+            Product product = context.get(Product.class, q);
+
+            context.delete(product);
+
             context.getTransaction().commit();
         }
     }
