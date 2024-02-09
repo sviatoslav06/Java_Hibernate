@@ -1,12 +1,15 @@
 package org.example;
 
 import org.example.models.Category;
+import org.example.models.Photo;
 import org.example.models.Product;
 import org.example.utils.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.internal.SessionImpl;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Scanner;
@@ -164,6 +167,7 @@ public class Main {
             Category category = new Category();
             category.setId(in.nextInt());
             product.setCategory(category);
+            AddImage(category.getId());
 
             context.save(product);
             context.getTransaction().commit();
@@ -233,6 +237,30 @@ public class Main {
             context.delete(product);
 
             context.getTransaction().commit();
+        }
+    }
+
+    private static void AddImage(int id) {
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        Scanner in = new Scanner(System.in);
+        System.out.println("Enter path to your image: ");
+        String name = in.nextLine();
+
+        try (Session context = sf.openSession()) {
+            context.beginTransaction();
+
+            Photo photo = new Photo();
+            File fi = new File(name);
+            byte[] fileContent = Files.readAllBytes(fi.toPath());
+            photo.setImageData(fileContent);
+            Product product = new Product();
+            product.setId(id);
+            photo.setProduct(product);
+
+            context.save(photo);
+            context.getTransaction().commit();;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

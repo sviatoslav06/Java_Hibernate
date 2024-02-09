@@ -2,6 +2,7 @@ package org.example.utils;
 
 import lombok.Getter;
 import org.example.models.Category;
+import org.example.models.Photo;
 import org.example.models.Product;
 import org.hibernate.SessionFactory;
 
@@ -16,6 +17,7 @@ public class HibernateUtil {
             Configuration conf = new Configuration().configure();
             conf.addAnnotatedClass(Category.class);
             conf.addAnnotatedClass(Product.class);
+            conf.addAnnotatedClass(Photo.class);
 
             sessionFactory = conf.buildSessionFactory();
         } catch(Throwable ex) {
